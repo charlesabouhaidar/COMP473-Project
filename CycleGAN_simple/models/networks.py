@@ -619,5 +619,3 @@ class PixelDiscriminator(nn.Module):
         """Standard forward."""
         return self.net(input)
 
-class SmallGenerator(nn.Module):
-
