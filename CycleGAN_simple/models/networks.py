@@ -687,15 +687,15 @@ class NLayerDiscriminator2(nn.Module):
                                                 kernel_size=4, bias=False, all_tanh=False, spec_norm=False,
                                                 activation= nn.LeakyReLU(negative_slope=2e-1)),
 
-                                    *conv_block(in_channels=64, out_channels=128, stride=2, no_BN=no_BN,
+                                    *conv_block(in_channels=64, out_channels=128, stride=2, no_BN=True,
                                                 kernel_size=4, bias=False, all_tanh=False, spec_norm=False,
                                                 activation= nn.LeakyReLU(negative_slope=2e-1)),
 
-                                    *conv_block(in_channels=128, out_channels=256, stride=2, no_BN=no_BN,
+                                    *conv_block(in_channels=128, out_channels=256, stride=2, no_BN=True,
                                                 kernel_size=4, bias=False, all_tanh=False, spec_norm=False,
                                                 activation= nn.LeakyReLU(negative_slope=2e-1)),
 
-                                    *conv_block(in_channels=256, out_channels=512, stride=2, no_BN=no_BN,
+                                    *conv_block(in_channels=256, out_channels=512, stride=2, no_BN=True,
                                                 kernel_size=4, bias=False, all_tanh=False, spec_norm=False,
                                                 activation= nn.LeakyReLU(negative_slope=2e-1)),
                                    
