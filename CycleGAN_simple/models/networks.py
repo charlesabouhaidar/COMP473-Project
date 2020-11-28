@@ -702,23 +702,23 @@ class Relative_Discriminator(nn.Module):
             use_bias = norm_layer == nn.InstanceNorm2d
 
         self.model = nn.Sequential( *conv_block(in_channels=3, out_channels=64, stride=2, no_BN=True,
-                                                kernel_size=4, bias=False, all_tanh=all_tanh, spec_norm=spec_norm,
+                                                kernel_size=4, bias=False, all_tanh=False, spec_norm=False,
                                                 activation= nn.LeakyReLU(negative_slope=2e-1)),
 
                                     *conv_block(in_channels=64, out_channels=128, stride=2, no_BN=False,
-                                                kernel_size=4, bias=False, all_tanh=all_tanh, spec_norm=spec_norm,
+                                                kernel_size=4, bias=False, all_tanh=False, spec_norm=False,
                                                 activation= nn.LeakyReLU(negative_slope=2e-1)),
 
                                     *conv_block(in_channels=128, out_channels=256, stride=2, no_BN=False,
-                                                kernel_size=4, bias=False, all_tanh=all_tanh, spec_norm=spec_norm,
+                                                kernel_size=4, bias=False, all_tanh=False, spec_norm=False,
                                                 activation= nn.LeakyReLU(negative_slope=2e-1)),
 
                                     *conv_block(in_channels=256, out_channels=512, stride=2, no_BN=False,
-                                                kernel_size=4, bias=False, all_tanh=all_tanh, spec_norm=spec_norm,
+                                                kernel_size=4, bias=False, all_tanh=False, spec_norm=False,
                                                 activation= nn.LeakyReLU(negative_slope=2e-1)),
                                    
                                     *conv_block(in_channels=512, out_channels=1, stride=2, no_BN=True,
-                                                kernel_size=4, bias=False, all_tanh=False, spec_norm=spec_norm,
+                                                kernel_size=4, bias=False, all_tanh=False, spec_norm=False,
                                                 activation=None)  )
                                     
     def forward(self, x):
