@@ -45,7 +45,7 @@ if __name__ == '__main__':
         if model.lambda_A < 20:
             model.lambda_A += model.lambda_increase
             model.lambda_B += model.lambda_increase
-        print("Cycle regularization increased to {}".format(model.lambda_A))
+            print("Cycle regularization increased to {}".format(model.lambda_A))
         for i, data in enumerate(dataset):  # inner loop within one epoch
             iter_start_time = time.time()  # timer for computation per iteration
             if total_iters % opt.print_freq == 0:
