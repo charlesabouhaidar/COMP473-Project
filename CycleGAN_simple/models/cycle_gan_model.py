@@ -51,8 +51,9 @@ class CycleGANModel(BaseModel):
             opt (Option class)-- stores all the experiment flags; needs to be a subclass of BaseOptions
         """
         BaseModel.__init__(self, opt)
-        self.lambda_A = .75
-        self.lambda_B = .75
+        self.lambda_A = opt.cycle_weight
+        self.lambda_B = opt.cycle_weight
+        self.lambda_increase = opt.cycle_weigth_inc
         # specify the training losses you want to print out. The training/test scripts will call <BaseModel.get_current_losses>
         self.loss_names = ['D_A', 'G_A', 'cycle_A', 'idt_A', 'D_B', 'G_B', 'cycle_B', 'idt_B']
         # specify the images you want to save/display. The training/test scripts will call <BaseModel.get_current_visuals>
