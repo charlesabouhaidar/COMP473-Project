@@ -204,6 +204,8 @@ def define_D(input_nc, ndf, netD, n_layers_D=3, norm='batch', init_type='normal'
         net = PixelDiscriminator(input_nc, ndf, norm_layer=norm_layer)
     elif netD == 'layer2':     # classify if each pixel is real or fake
         net = NLayerDiscriminator2(input_nc, ndf, norm_layer=norm_layer)
+    elif netD == 'relative':     # classify if each pixel is real or fake
+        net = Relative_Discriminator(input_nc, ndf, norm_layer=norm_layer)
     else:
         raise NotImplementedError('Discriminator model name [%s] is not recognized' % netD)
     return init_net(net, init_type, init_gain, gpu_ids)
@@ -662,27 +664,7 @@ class NLayerDiscriminator2(nn.Module):
         else:
             use_bias = norm_layer == nn.InstanceNorm2d
 
-        # kw = 4
-        # padw = 1
-        # sequence = [nn.Conv2d(input_nc, ndf, kernel_size=kw, stride=2, padding=padw), nn.LeakyReLU(0.2, True)]
-        # nf_mult = 1
-        # nf_mult_prev = 1
-        # for n in range(1, n_layers):  # gradually increase the number of filters
-        #     nf_mult_prev = nf_mult
-        #     nf_mult = min(2 ** n, 8)
-        #     sequence += [
-        #         nn.Conv2d(ndf * nf_mult_prev, ndf * nf_mult, kernel_size=kw, stride=2, padding=padw, bias=use_bias),
-        #         norm_layer(ndf * nf_mult),
-        #         nn.LeakyReLU(0.2, True)
-        #     ]
 
-        # nf_mult_prev = nf_mult
-        # nf_mult = min(2 ** n_layers, 8)
-        # sequence += [
-        #     nn.Conv2d(ndf * nf_mult_prev, ndf * nf_mult, kernel_size=kw, stride=1, padding=padw, bias=use_bias),
-        #     norm_layer(ndf * nf_mult),
-        #     nn.LeakyReLU(0.2, True)
-        # ]
         self.model = nn.Sequential( *conv_block(in_channels=3, out_channels=64, stride=2, no_BN=True,
                                                 kernel_size=4, bias=False, all_tanh=False, spec_norm=False,
                                                 activation= nn.LeakyReLU(negative_slope=2e-1)),
@@ -705,10 +687,39 @@ class NLayerDiscriminator2(nn.Module):
                                     
                                     )
         
-        
-        # sequence += [nn.Conv2d(ndf * nf_mult, 1, kernel_size=kw, stride=1, padding=padw)]  # output 1 channel prediction map
-        # self.model = nn.Sequential(*sequence)
 
     def forward(self, input):
         """Standard forward."""
         return self.model(input)
+class Relative_Discriminator(nn.Module):
+    
+    def __init__(self, input_nc, ndf=64, n_layers=2, norm_layer=nn.BatchNorm2d):
+
+        super(Relative_Discriminator, self).__init__()
+        if type(norm_layer) == functools.partial:  # no need to use bias as BatchNorm2d has affine parameters
+            use_bias = norm_layer.func == nn.InstanceNorm2d
+        else:
+            use_bias = norm_layer == nn.InstanceNorm2d
+
+        self.model = nn.Sequential( *conv_block(in_channels=3, out_channels=64, stride=2, no_BN=True,
+                                                kernel_size=4, bias=False, all_tanh=all_tanh, spec_norm=spec_norm,
+                                                activation= nn.LeakyReLU(negative_slope=2e-1)),
+
+                                    *conv_block(in_channels=64, out_channels=128, stride=2, no_BN=False,
+                                                kernel_size=4, bias=False, all_tanh=all_tanh, spec_norm=spec_norm,
+                                                activation= nn.LeakyReLU(negative_slope=2e-1)),
+
+                                    *conv_block(in_channels=128, out_channels=256, stride=2, no_BN=False,
+                                                kernel_size=4, bias=False, all_tanh=all_tanh, spec_norm=spec_norm,
+                                                activation= nn.LeakyReLU(negative_slope=2e-1)),
+
+                                    *conv_block(in_channels=256, out_channels=512, stride=2, no_BN=False,
+                                                kernel_size=4, bias=False, all_tanh=all_tanh, spec_norm=spec_norm,
+                                                activation= nn.LeakyReLU(negative_slope=2e-1)),
+                                   
+                                    *conv_block(in_channels=512, out_channels=1, stride=2, no_BN=True,
+                                                kernel_size=4, bias=False, all_tanh=False, spec_norm=spec_norm,
+                                                activation=None)  )
+                                    
+    def forward(self, x):
+        return self.model(x)
