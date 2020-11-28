@@ -164,7 +164,7 @@ def define_G(input_nc, output_nc, ngf, netG, norm='batch', use_dropout=False, in
     elif netG == 'unet_256':
         net = UnetGenerator(input_nc, output_nc, 8, ngf, norm_layer=norm_layer, use_dropout=use_dropout)
     elif netG == 'new':
-        net = NewGenerator()
+        net = NewGenerator(input_nc, output_nc, ngf, norm_layer=norm_layer, use_dropout=use_dropout, n_blocks=6)
     else:
         raise NotImplementedError('Generator model name [%s] is not recognized' % netG)
     return init_net(net, init_type, init_gain, gpu_ids)
@@ -745,11 +745,10 @@ class Relative_Discriminator(nn.Module):
 
 class NewGenerator(nn.Module):
 
-    def __init__(self, input_nc, output_nc, ngf=64, norm_layer=nn.BatchNorm2d, use_dropout=False, n_blocks=3,
+    def __init__(self, input_nc, output_nc, ngf=64, norm_layer=nn.BatchNorm2d, use_dropout=False,
                  padding_type='reflect'):
         """Construct a Resnet-based generator"""
 
-        assert (n_blocks >= 0)
         super(NewGenerator, self).__init__()
         if type(norm_layer) == functools.partial: # won't be needed
             use_bias = norm_layer.func == nn.InstanceNorm2d
