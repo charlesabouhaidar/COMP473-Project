@@ -40,7 +40,7 @@ if __name__ == '__main__':
         iter_data_time = time.time()    # timer for data loading per iteration
         epoch_iter = 0                  # the number of training iterations in current epoch, reset to 0 every epoch
         visualizer.reset()              # reset the visualizer: make sure it saves the results to HTML at least once every epoch
-        print("it isn't the directories")
+        
         model.update_learning_rate()    # update learning rates in the beginning of every epoch.
         if model.lambda_A < 20:
             model.lambda_A += model.lambda_increase
@@ -65,7 +65,7 @@ if __name__ == '__main__':
                 #TODO save training losses somewhere other than visdom
                 losses = model.get_current_losses()
                 t_comp = (time.time() - iter_start_time) / opt.batch_size
-                visualizer.print_current_losses(epoch, epoch_iter, losses, t_comp, t_data)
+                visualizer.print_current_losses(epoch, total_iters, losses, t_comp, t_data)
                 if opt.display_id > 0:
                     visualizer.plot_current_losses(epoch, float(epoch_iter) / dataset_size, losses)
 

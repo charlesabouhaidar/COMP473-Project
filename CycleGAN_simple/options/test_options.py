@@ -19,5 +19,8 @@ class TestOptions(BaseOptions):
         parser.set_defaults(model='test')
         # To avoid cropping, the load_size should be the same as crop_size
         parser.set_defaults(load_size=parser.get_default('crop_size'))
+        parser.add_argument('--cycle_weight', type=float, default=10., help='lambda weight on cycle consistency loss')
+        parser.add_argument('--cycle_weigth_inc', type=float, default=0., help='increase on lambda weight on cycle consistency loss')
+        
         self.isTrain = False
         return parser
