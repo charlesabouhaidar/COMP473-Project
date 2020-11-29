@@ -755,12 +755,21 @@ class NewGenerator(nn.Module):
         else:
             use_bias = norm_layer == nn.InstanceNorm2d
         
-        self.model = nn.Sequential( *conv_block(in_channels=input_nc, out_channels=ngf, stride=2, kernel_size=7,
-                                                transpose=True, no_BN=False, all_tanh=False),
+        self.model = nn.Sequential( [nn.ReflectionPad2d(3),
+                                       nn.Conv2d(input_nc, ngf, kernel_size=7, padding=0, bias=use_bias),
+                                     norm_layer(ngf),
+                                    nn.ReLU(True)],
+                                    [nn.ConvTranspose2d(ngf * mult, int(ngf * mult / 2),
+                                         kernel_size=3, stride=2,
+                                         padding=1, output_padding=1,
+                                         bias=use_bias),
+                                         norm_layer(int(ngf * mult / 2)),
+                                         nn.ReLU(True)],
+                                     [nn.ReflectionPad2d(3)],
 
-
-                                    *conv_block(in_channels=ngf, out_channels=output_nc,  stride=1, kernel_size=7,
-                                                transpose=True, no_BN=False, all_tanh=False)  )
+                                     [nn.Conv2d(ngf, output_nc, kernel_size=7, padding=0)],
+                                     [nn.Tanh()]                       
+                                    )
         
 
     def forward(self, x):
