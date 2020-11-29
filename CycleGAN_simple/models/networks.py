@@ -755,7 +755,6 @@ class NewGenerator(nn.Module):
         else:
             use_bias = norm_layer == nn.InstanceNorm2d
         
-        self.linear = nn.Sequential(nn.Flatten(), nn.Linear(128, 512*4*4))
         self.model = nn.Sequential( *conv_block(in_channels=input_nc, out_channels=256, stride=2, kernel_size=7,
                                                 transpose=True, no_BN=False, all_tanh=False),
 
@@ -770,8 +769,6 @@ class NewGenerator(nn.Module):
         
 
     def forward(self, x):
-        linear = self.linear(x)
 
-        reshaped = linear.view(-1,512,4,4)
 
-        return self.model(reshaped)
+        return self.model(x)
