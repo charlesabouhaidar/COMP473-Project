@@ -770,7 +770,7 @@ class NewGenerator(nn.Module):
         
 
     def forward(self, x):
-        linear = self.linear(z)
+        linear = self.linear(x)
 
         reshaped = linear.view(-1,512,4,4)
 
