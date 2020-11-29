@@ -742,7 +742,6 @@ class Relative_Discriminator(nn.Module):
     def forward(self, x):
         return self.model(x)
 
-
 class NewGenerator(nn.Module):
 
     def __init__(self, input_nc, output_nc, ngf=64, norm_layer=nn.BatchNorm2d, use_dropout=False,
@@ -754,18 +753,26 @@ class NewGenerator(nn.Module):
             use_bias = norm_layer.func == nn.InstanceNorm2d
         else:
             use_bias = norm_layer == nn.InstanceNorm2d
-        
-        self.model = nn.Sequential( [nn.ReflectionPad2d(3),
-                                       nn.Conv2d(input_nc, ngf, kernel_size=7, padding=0, bias=use_bias),
-                                     norm_layer(ngf),
-                                    nn.ReLU(True)],
-                
-                                     [nn.ReflectionPad2d(3)],
 
-                                     [nn.Conv2d(ngf, output_nc, kernel_size=7, padding=0)],
-                                     [nn.Tanh()]                       
-                                    )
-        
+        self.model = nn.Sequential(*conv_block(in_channels=input_nc, out_channels=64, stride=2, no_BN=True,
+                                               kernel_size=4, bias=False, all_tanh=False, spec_norm=False,
+                                               activation=nn.LeakyReLU(negative_slope=2e-1)),
+
+                                   *conv_block(in_channels=64, out_channels=128, stride=2, no_BN=False,
+                                               kernel_size=4, bias=False, all_tanh=False, spec_norm=False,
+                                               activation=nn.LeakyReLU(negative_slope=2e-1)),
+
+                                   *conv_block(in_channels=128, out_channels=256, stride=2, no_BN=False,
+                                               kernel_size=4, bias=False, all_tanh=False, spec_norm=False,
+                                               activation=nn.LeakyReLU(negative_slope=2e-1)),
+
+                                   *conv_block(in_channels=256, out_channels=512, stride=2, no_BN=False,
+                                               kernel_size=4, bias=False, all_tanh=False, spec_norm=False,
+                                               activation=nn.LeakyReLU(negative_slope=2e-1)),
+
+                                   *conv_block(in_channels=512, out_channels=output_nc, stride=2, no_BN=True,
+                                               kernel_size=4, bias=False, all_tanh=False, spec_norm=False,
+                                               activation=None))
 
     def forward(self, x):
         return self.model(x)
