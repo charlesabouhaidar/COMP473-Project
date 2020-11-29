@@ -755,14 +755,9 @@ class NewGenerator(nn.Module):
         else:
             use_bias = norm_layer == nn.InstanceNorm2d
         
-        self.model = nn.Sequential( *conv_block(in_channels=input_nc, out_channels=128, stride=2, kernel_size=7,
+        self.model = nn.Sequential( *conv_block(in_channels=input_nc, out_channels=64, stride=2, kernel_size=7,
                                                 transpose=True, no_BN=False, all_tanh=False),
 
-                                    *conv_block(in_channels=128, out_channels=128,  stride=2, kernel_size=3,
-                                                transpose=True, no_BN=False, all_tanh=False),
-
-                                    *conv_block(in_channels=128, out_channels=64,  stride=2, kernel_size=7,
-                                                transpose=True, no_BN=False, all_tanh=False),
 
                                     *conv_block(in_channels=64, out_channels=output_nc,  stride=1, kernel_size=3,
                                                 transpose=True, no_BN=True, all_tanh=True)  )
