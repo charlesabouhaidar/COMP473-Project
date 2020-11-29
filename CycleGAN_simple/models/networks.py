@@ -759,7 +759,7 @@ class NewGenerator(nn.Module):
                                                 transpose=True, no_BN=False, all_tanh=False),
 
 
-                                    *conv_block(in_channels=ngf, out_channels=output_nc,  stride=1, kernel_size=3,
+                                    *conv_block(in_channels=ngf, out_channels=output_nc,  stride=1, kernel_size=7,
                                                 transpose=True, no_BN=False, all_tanh=False)  )
         
 
