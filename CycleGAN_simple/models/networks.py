@@ -754,26 +754,24 @@ class NewGenerator(nn.Module):
             use_bias = norm_layer.func == nn.InstanceNorm2d
         else:
             use_bias = norm_layer == nn.InstanceNorm2d
+        
+        self.linear = nn.Sequential(nn.Flatten(), nn.Linear(128, 512*4*4))
+        self.model = nn.Sequential( *conv_block(in_channels=input_nc, out_channels=256, stride=2, kernel_size=7,
+                                                transpose=True, no_BN=False, all_tanh=False),
 
-        self.model = nn.Sequential(*conv_block(in_channels=3, out_channels=64, stride=2, no_BN=True,
-                                               kernel_size=4, bias=False, all_tanh=False, spec_norm=False,
-                                               activation=nn.LeakyReLU(negative_slope=2e-1)),
+                                    *conv_block(in_channels=256, out_channels=128,  stride=2, kernel_size=3,
+                                                transpose=True, no_BN=False, all_tanh=False),
 
-                                   *conv_block(in_channels=64, out_channels=128, stride=2, no_BN=False,
-                                               kernel_size=4, bias=False, all_tanh=False, spec_norm=False,
-                                               activation=nn.LeakyReLU(negative_slope=2e-1)),
+                                    *conv_block(in_channels=128, out_channels=64,  stride=2, kernel_size=7,
+                                                transpose=True, no_BN=False, all_tanh=False),
 
-                                   *conv_block(in_channels=128, out_channels=256, stride=2, no_BN=False,
-                                               kernel_size=4, bias=False, all_tanh=False, spec_norm=False,
-                                               activation=nn.LeakyReLU(negative_slope=2e-1)),
-
-                                   *conv_block(in_channels=256, out_channels=512, stride=2, no_BN=False,
-                                               kernel_size=4, bias=False, all_tanh=False, spec_norm=False,
-                                               activation=nn.LeakyReLU(negative_slope=2e-1)),
-
-                                   *conv_block(in_channels=512, out_channels=1, stride=2, no_BN=True,
-                                               kernel_size=4, bias=False, all_tanh=False, spec_norm=False,
-                                               activation=None))
+                                    *conv_block(in_channels=64, out_channels=output_nc,  stride=1, kernel_size=3,
+                                                transpose=True, no_BN=True, all_tanh=True)  )
+        
 
     def forward(self, x):
-        return self.model(x)
+        linear = self.linear(z)
+
+        reshaped = linear.view(-1,512,4,4)
+
+        return self.model(reshaped)
