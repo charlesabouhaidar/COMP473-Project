@@ -164,7 +164,7 @@ def define_G(input_nc, output_nc, ngf, netG, norm='batch', use_dropout=False, in
     elif netG == 'unet_256':
         net = UnetGenerator(input_nc, output_nc, 8, ngf, norm_layer=norm_layer, use_dropout=use_dropout)
     elif netG == 'new':
-        net = NewGenerator(input_nc, output_nc, ngf, norm_layer=norm_layer, use_dropout=use_dropout)
+        net = NewGenerator()
     else:
         raise NotImplementedError('Generator model name [%s] is not recognized' % netG)
     return init_net(net, init_type, init_gain, gpu_ids)
@@ -745,35 +745,23 @@ class Relative_Discriminator(nn.Module):
 
 class NewGenerator(nn.Module):
 
-    def __init__(self, input_nc, output_nc, ngf=64, norm_layer=nn.BatchNorm2d, use_dropout=False,
-                 padding_type='reflect'):
-        """Construct a Resnet-based generator"""
-
+    def __init__(self, no_BN=False, all_tanh=False):
         super(NewGenerator, self).__init__()
-        if type(norm_layer) == functools.partial: # won't be needed
-            use_bias = norm_layer.func == nn.InstanceNorm2d
-        else:
-            use_bias = norm_layer == nn.InstanceNorm2d
 
-        self.model = nn.Sequential(*conv_block(in_channels=3, out_channels=64, stride=2, no_BN=True,
-                                               kernel_size=4, bias=False, all_tanh=False, spec_norm=False,
-                                               activation=nn.LeakyReLU(negative_slope=2e-1)),
+        self.model = nn.Sequential(*conv_block(in_channels=128, out_channels=512, stride=1, bias=False, padding=0,
+                                               transpose=True, kernel_size=4, no_BN=no_BN, all_tanh=all_tanh),
 
-                                   *conv_block(in_channels=64, out_channels=128, stride=2, no_BN=False,
-                                               kernel_size=4, bias=False, all_tanh=False, spec_norm=False,
-                                               activation=nn.LeakyReLU(negative_slope=2e-1)),
+                                   *conv_block(in_channels=512, out_channels=256, stride=2, bias=False,
+                                               transpose=True, kernel_size=4, no_BN=no_BN, all_tanh=all_tanh),
 
-                                   *conv_block(in_channels=128, out_channels=256, stride=2, no_BN=False,
-                                               kernel_size=4, bias=False, all_tanh=False, spec_norm=False,
-                                               activation=nn.LeakyReLU(negative_slope=2e-1)),
+                                   *conv_block(in_channels=256, out_channels=128, stride=2, bias=False,
+                                               transpose=True, kernel_size=4, no_BN=no_BN, all_tanh=all_tanh),
 
-                                   *conv_block(in_channels=256, out_channels=512, stride=2, no_BN=False,
-                                               kernel_size=4, bias=False, all_tanh=False, spec_norm=False,
-                                               activation=nn.LeakyReLU(negative_slope=2e-1)),
+                                   *conv_block(in_channels=128, out_channels=64, stride=2, bias=False,
+                                               transpose=True, kernel_size=4, no_BN=no_BN, all_tanh=all_tanh),
 
-                                   *conv_block(in_channels=512, out_channels=1, stride=2, no_BN=True,
-                                               kernel_size=4, bias=False, all_tanh=False, spec_norm=False,
-                                               activation=None))
+                                   *conv_block(in_channels=64, out_channels=3, stride=2, bias=False,
+                                               transpose=True, kernel_size=4, no_BN=True, all_tanh=True))
 
-    def forward(self, x):
-        return self.model(x)
+    def forward(self, z):
+        return self.model(z)
