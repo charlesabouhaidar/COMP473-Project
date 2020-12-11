@@ -8,3 +8,4 @@
 * Arthur Tourneyrie (40035964)
 * Patrick Youssef (40098029)
 
+Codebase started from original authors' code at https://github.com/junyanz/pytorch-CycleGAN-and-pix2pix
